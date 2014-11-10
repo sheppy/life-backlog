@@ -17,6 +17,7 @@
   "dependencies": {
     "css-material": "git@github.com:sheppy/css-material.git",
     "angular": "~1.3.2",
-    "angular-ui-router": "~0.2.11"
+    "angular-ui-router": "~0.2.11",
+    "sass-list-maps": "~1.0.0"
   }
 }

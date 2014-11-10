@@ -13,7 +13,7 @@ var CONFIG = {
     SRC: {
         //SCSS: "src/assets/scss",
         SCSS_GLOB: "src/assets/scss/**/*.scss",
-        MATERIAL: "./bower_components/css-material/src",
+        MATERIAL: "bower_components/css-material/src",
         COFFEE: "src/assets/coffee",
         COFFEE_GLOB: "src/assets/coffee/**/*.coffee",
         HTML_GLOB: "src/views/**/*.html",
@@ -22,12 +22,14 @@ var CONFIG = {
     DIST: {
         DIR: "dist",
         CSS: "dist/assets/css",
-        CSS_GLOB: "dist/assets/css/*.css",
+        CSS_GLOB: "assets/css/*.min.css",
         JS: "dist/assets/js",
-        JS_GLOB: "dist/assets/js/**/*.js",
-        HTML_GLOB: "dist/views/**/*.html",
-        FONT: "dist/assets/font/",
-        VENDOR: "dist/assets/vendor"
+        JS_GLOB: "dist/assets/js/**/*.min.js",
+        JS_INJECT: "assets/js",
+        HTML_GLOB: "dist/**/*.html",
+        FONT: "dist/assets/font",
+        VENDOR: "dist/assets/vendor",
+        VENDOR_INJECT: "assets/vendor"
     },
     FILTER: {
         JS: "**/*.js"
@@ -56,7 +58,10 @@ gulp.task("css", function () {
     return gulp.src(CONFIG.SRC.SCSS_GLOB)
         .pipe($.plumber({errorHandler: onError}))
         .pipe($.sass({
-            includePaths: [CONFIG.SRC.MATERIAL + "/assets/scss/material"],
+            includePaths: [
+                "bower_components/sass-list-maps",
+                CONFIG.SRC.MATERIAL + "/assets/scss/material"
+            ],
             style: "expanded"
         }))
         .pipe($.autoprefixer("last 2 version", "safari 5", "ie 9", "opera 12.1", "ios 6", "android 4"))
@@ -81,7 +86,7 @@ gulp.task("js", function () {
             .pipe($.plumber({errorHandler: onError}))
             .pipe($.coffeelint())
             .pipe($.coffeelint.reporter("default"))
-            .pipe($.coffee({bare: false}).on("error", $.util.log))
+            .pipe($.coffee({bare: false}).on("error", onError))
             .pipe($.concat(folder + ".js"))
             .pipe($.ngAnnotate())
             .pipe($.rename({suffix: ".min"}))
@@ -97,14 +102,15 @@ gulp.task("html", function () {
     return gulp.src(CONFIG.SRC.HTML_GLOB)
         .pipe($.plumber({errorHandler: onError}))
 
+
         .pipe($.inject(gulp.src(CONFIG.DIST.CSS_GLOB, {
             read: false,
             cwd: CONFIG.DIST.DIR
         }), {addRootSlash: false}))
 
         .pipe($.inject(gulp.src([
-            CONFIG.DIST.VENDOR + "/angular.min.js",
-            CONFIG.DIST.VENDOR + "/**/*.min.js"
+            CONFIG.DIST.VENDOR_INJECT + "/angular.min.js",
+            CONFIG.DIST.VENDOR_INJECT + "/**/*.min.js"
         ], {
             read: false,
             cwd: CONFIG.DIST.DIR
@@ -112,10 +118,10 @@ gulp.task("html", function () {
             return b - a;
         })), {addRootSlash: false, name: "vendor"}))
 
-        // Bootstrap needs to come last
+        //Bootstrap needs to come last
         .pipe($.inject(gulp.src([
-            CONFIG.DIST.JS + "/bootstrap.min.js",
-            CONFIG.DIST.JS + "/**/*.min.js"
+            CONFIG.DIST.JS_INJECT + "/bootstrap.min.js",
+            CONFIG.DIST.JS_INJECT + "/**/*.min.js"
         ], {
             read: false,
             cwd: CONFIG.DIST.DIR
