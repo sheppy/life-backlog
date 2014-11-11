@@ -29,3 +29,14 @@ module.config ($urlRouterProvider, $stateProvider) ->
                 templateUrl: "templates/page/home/app-bar.tpl.html"
             "content@home":
                 templateUrl: "templates/page/home/content.tpl.html"
+
+    # Backlog
+    $stateProvider.state "backlog",
+        url: "/backlog",
+        views:
+            "master":
+                templateUrl: "templates/page.tpl.html"
+            "app-bar@backlog":
+                templateUrl: "templates/page/backlog/app-bar.tpl.html"
+            "content@backlog":
+                templateUrl: "templates/page/backlog/content.tpl.html"
